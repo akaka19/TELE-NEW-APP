@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,23 +17,28 @@ import android.widget.Toast
 class PersonDetailActivity : Activity() {
 
     private lateinit var db: DatabaseHelper
+    private lateinit var nameView: TextView
+    private lateinit var phoneView: TextView
+    private lateinit var details: LinearLayout
     private var personId = 0L
     private var current: CompanyPerson? = null
 
     private fun dp(v: Int) =
         (v * resources.displayMetrics.density).toInt()
 
-    private fun label(text: String, size: Float, bold: Boolean = false) =
-        TextView(this).apply {
-            this.text = text
-            textSize = size
-            setTextColor(if (Ui.isDark(this@PersonDetailActivity)) Color.WHITE else Color.BLACK)
-            if (bold) setTypeface(null, android.graphics.Typeface.BOLD)
-        }
+    private fun makeText(
+        value: String,
+        size: Float,
+        bold: Boolean = false
+    ) = TextView(this).apply {
+        text = value
+        textSize = size
+        setTextColor(if (Ui.isDark(this@PersonDetailActivity)) Color.WHITE else Color.BLACK)
+        if (bold) setTypeface(null, android.graphics.Typeface.BOLD)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         db = DatabaseHelper(this)
         personId = intent.getLongExtra("person_id", 0L)
 
@@ -44,38 +48,44 @@ class PersonDetailActivity : Activity() {
             setBackgroundColor(Ui.background(this@PersonDetailActivity))
         }
 
-        root.addView(label("PERSON PROFILE", 12f, true).apply {
+        root.addView(makeText("PERSON PROFILE", 12f, true).apply {
             setTextColor(0xFF35D7F2.toInt())
         })
 
-        root.addView(label("", 27f, true).also {
-            it.tag = "personName"
-        })
+        nameView = makeText("", 27f, true)
+        root.addView(nameView)
 
-        root.addView(label("", 18f, true).also {
-            it.tag = "personPhone"
-            it.setTextColor(0xFF35D7F2.toInt())
-        })
-
-        val details = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            tag = "details"
+        phoneView = makeText("", 18f, true).apply {
+            setTextColor(0xFF35D7F2.toInt())
         }
-        root.addView(details, LinearLayout.LayoutParams(-1, 0, 1f))
+        root.addView(phoneView)
+
+        val scroll = android.widget.ScrollView(this)
+        details = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        scroll.addView(details)
+        root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
 
         root.addView(Button(this).apply {
             text = "Appeler"
             isAllCaps = false
             setOnClickListener {
-                current?.phoneNumber?.takeIf { it.isNotBlank() }?.let {
+                val phone = current?.phoneNumber.orEmpty()
+                if (phone.isNotBlank()) {
                     startActivity(
-                        Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(it)}"))
+                        Intent(
+                            Intent.ACTION_DIAL,
+                            Uri.parse("tel:${Uri.encode(phone)}")
+                        )
                     )
-                } ?: Toast.makeText(
-                    this@PersonDetailActivity,
-                    "Aucun numéro enregistré",
-                    Toast.LENGTH_SHORT
-                ).show()
+                } else {
+                    Toast.makeText(
+                        this@PersonDetailActivity,
+                        "Aucun numéro enregistré",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         })
 
@@ -83,9 +93,13 @@ class PersonDetailActivity : Activity() {
             text = "Copier le numéro"
             isAllCaps = false
             setOnClickListener {
-                current?.phoneNumber?.takeIf { it.isNotBlank() }?.let {
-                    val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                    clipboard.setPrimaryClip(ClipData.newPlainText("Phone", it))
+                val phone = current?.phoneNumber.orEmpty()
+                if (phone.isNotBlank()) {
+                    val clipboard =
+                        getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(
+                        ClipData.newPlainText("Phone", phone)
+                    )
                     Toast.makeText(
                         this@PersonDetailActivity,
                         "Numéro copié",
@@ -144,7 +158,7 @@ class PersonDetailActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        if (::db.isInitialized) render()
+        if (::db.isInitialized && ::nameView.isInitialized) render()
     }
 
     private fun render() {
@@ -153,40 +167,16 @@ class PersonDetailActivity : Activity() {
             finish()
             return
         }
+
         current = person
+        nameView.text = person.name
+        phoneView.text = person.phoneNumber
 
-        (findViewById<TextViewByTag>("personName"))
-    }
-
-    private fun findViewByIdTextByTag(tagValue: String): TextView? {
-        val root = window.decorView
-        return findTaggedText(root as? android.view.ViewGroup, tagValue)
-    }
-
-    private fun findTaggedText(
-        group: android.view.ViewGroup?,
-        tagValue: String
-    ): TextView? {
-        if (group == null) return null
-        for (i in 0 until group.childCount) {
-            val child = group.getChildAt(i)
-            if (child is TextView && child.tag == tagValue) return child
-            if (child is android.view.ViewGroup) {
-                val found = findTaggedText(child, tagValue)
-                if (found != null) return found
-            }
-        }
-        return null
-    }
-
-    private fun renderDetails(person: CompanyPerson) {
-        findViewByIdTextByTag("personName")?.text = person.name
-        findViewByIdTextByTag("personPhone")?.text = person.phoneNumber
-
-        val details = findViewByIdLinearByTag("details") ?: return
         details.removeAllViews()
 
-        val companyName = db.getCompanyById(person.companyId)?.name.orEmpty()
+        val companyName =
+            db.getCompanyById(person.companyId)?.name.orEmpty()
+
         val values = listOf(
             "Société" to companyName,
             "Service / Département" to person.service,
@@ -199,12 +189,15 @@ class PersonDetailActivity : Activity() {
                 setPadding(dp(13), dp(12), dp(13), dp(12))
                 background = Ui.card(this@PersonDetailActivity)
             }
-            card.addView(label(key.uppercase(), 11f, true).apply {
+
+            card.addView(makeText(key.uppercase(), 11f, true).apply {
                 setTextColor(0xFF35D7F2.toInt())
             })
-            card.addView(label(value, 16f).apply {
+
+            card.addView(makeText(value, 16f).apply {
                 setPadding(0, dp(5), 0, 0)
             })
+
             details.addView(
                 card,
                 LinearLayout.LayoutParams(-1, -2).apply {
@@ -212,25 +205,5 @@ class PersonDetailActivity : Activity() {
                 }
             )
         }
-    }
-
-    private fun findViewByIdLinearByTag(tagValue: String): LinearLayout? {
-        return findTaggedLinear(window.decorView as? android.view.ViewGroup, tagValue)
-    }
-
-    private fun findTaggedLinear(
-        group: android.view.ViewGroup?,
-        tagValue: String
-    ): LinearLayout? {
-        if (group == null) return null
-        for (i in 0 until group.childCount) {
-            val child = group.getChildAt(i)
-            if (child is LinearLayout && child.tag == tagValue) return child
-            if (child is android.view.ViewGroup) {
-                val found = findTaggedLinear(child, tagValue)
-                if (found != null) return found
-            }
-        }
-        return null
     }
 }
