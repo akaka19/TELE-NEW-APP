@@ -1,4 +1,5 @@
 
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/mainRoot"
     android:layout_width="match_parent"
@@ -12,6 +13,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
+
+        <!-- Side menu button -->
+        <Button
+            android:id="@+id/menuButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:text="☰"
+            android:textSize="22sp"
+            android:textAllCaps="false"
+            android:backgroundTint="#202A42"
+            android:textColor="#35D7F2" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -38,18 +51,20 @@
 
         </LinearLayout>
 
+        <!-- Theme button -->
         <Button
             android:id="@+id/themeButton"
-            android:layout_width="52dp"
+            android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="☼"
             android:textAllCaps="false"
             android:backgroundTint="#202A42"
             android:textColor="#35D7F2" />
 
+        <!-- Settings / security -->
         <Button
             android:id="@+id/securityButton"
-            android:layout_width="52dp"
+            android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="5dp"
             android:text="⚙"
@@ -163,19 +178,6 @@
     </FrameLayout>
 
     <!-- Add contact -->
-    
-<Button
-    android:id="@+id/societyButton"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:layout_marginTop="8dp"
-    android:backgroundTint="#8B7CFF"
-    android:text="▦  Société"
-    android:textAllCaps="false"
-    android:textColor="#FFFFFF"
-    android:textSize="15sp"
-    android:textStyle="bold" />
-
     <Button
         android:id="@+id/addButton"
         android:layout_width="match_parent"
