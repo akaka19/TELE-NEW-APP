@@ -12,7 +12,6 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
-import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -79,11 +78,13 @@ class ContactDetailActivity : Activity() {
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Delete") { _, _ ->
                     db.delete(contactId)
+
                     Toast.makeText(
                         this,
                         "Contact deleted",
                         Toast.LENGTH_SHORT
                     ).show()
+
                     finish()
                 }
                 .show()
@@ -99,6 +100,7 @@ class ContactDetailActivity : Activity() {
 
     private fun render() {
         current = db.getById(contactId)
+
         val c = current ?: run {
             finish()
             return
@@ -145,7 +147,11 @@ class ContactDetailActivity : Activity() {
 
         values.filter { it.third.isNotBlank() }.forEach { item ->
             fieldsBox.addView(
-                createDetailCard(item.second, item.third, item.first),
+                createDetailCard(
+                    item.second,
+                    item.third,
+                    item.first
+                ),
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -156,13 +162,15 @@ class ContactDetailActivity : Activity() {
         }
 
         if (fieldsBox.childCount == 0) {
-            fieldsBox.addView(TextView(this).apply {
-                text = "No additional details available."
-                textSize = 14f
-                setTextColor(Ui.muted(this@ContactDetailActivity))
-                gravity = Gravity.CENTER
-                setPadding(dp(12), dp(24), dp(12), dp(24))
-            })
+            fieldsBox.addView(
+                TextView(this).apply {
+                    text = "No additional details available."
+                    textSize = 14f
+                    setTextColor(Ui.muted(this@ContactDetailActivity))
+                    gravity = Gravity.CENTER
+                    setPadding(dp(12), dp(24), dp(12), dp(24))
+                }
+            )
         }
     }
 
@@ -171,16 +179,22 @@ class ContactDetailActivity : Activity() {
         value: String,
         category: String
     ): LinearLayout {
+
         val dark = Ui.isDark(this)
+
+        val cardColor = if (dark) {
+            Color.rgb(30, 41, 59)
+        } else {
+            Color.WHITE
+        }
 
         val card = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(14), dp(14), dp(14), dp(14))
-            background = roundedBackground(
-                Ui.card(this@ContactDetailActivity),
-                16
-            )
+
+            // تصحيح الخطأ: الدالة كتستقبل لون Int
+            background = roundedBackground(cardColor, 16)
         }
 
         val icon = TextView(this).apply {
@@ -192,14 +206,18 @@ class ContactDetailActivity : Activity() {
                 "TELEPHONE" -> "☎"
                 else -> "◇"
             }
+
             textSize = 20f
             gravity = Gravity.CENTER
             setTextColor(cyan)
-            background = roundedBackground(
-                if (dark) Color.rgb(25, 49, 68)
-                else Color.rgb(225, 246, 251),
-                12
-            )
+
+            val iconColor = if (dark) {
+                Color.rgb(25, 49, 68)
+            } else {
+                Color.rgb(225, 246, 251)
+            }
+
+            background = roundedBackground(iconColor, 12)
         }
 
         card.addView(
@@ -212,19 +230,23 @@ class ContactDetailActivity : Activity() {
             setPadding(dp(12), 0, 0, 0)
         }
 
-        textBox.addView(TextView(this).apply {
-            text = label
-            textSize = 12f
-            setTextColor(Ui.muted(this@ContactDetailActivity))
-        })
+        textBox.addView(
+            TextView(this).apply {
+                text = label
+                textSize = 12f
+                setTextColor(Ui.muted(this@ContactDetailActivity))
+            }
+        )
 
-        textBox.addView(TextView(this).apply {
-            text = value
-            textSize = 16f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Ui.text(this@ContactDetailActivity))
-            setPadding(0, dp(4), 0, 0)
-        })
+        textBox.addView(
+            TextView(this).apply {
+                text = value
+                textSize = 16f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(Ui.text(this@ContactDetailActivity))
+                setPadding(0, dp(4), 0, 0)
+            }
+        )
 
         card.addView(
             textBox,
@@ -234,12 +256,17 @@ class ContactDetailActivity : Activity() {
         return card
     }
 
-    private fun styleButton(button: Button, accent: Int) {
+    private fun styleButton(button: Button, buttonColor: Int) {
         button.setTextColor(
-            if (accent == cyan) Color.rgb(8, 24, 38) else Color.WHITE
+            if (buttonColor == cyan) {
+                Color.rgb(8, 24, 38)
+            } else {
+                Color.WHITE
+            }
         )
+
         button.typeface = Typeface.DEFAULT_BOLD
-        button.background = roundedBackground(accent, 12)
+        button.background = roundedBackground(buttonColor, 12)
         button.isAllCaps = false
         button.minHeight = dp(46)
     }
