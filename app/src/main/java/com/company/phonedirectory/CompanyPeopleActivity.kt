@@ -58,7 +58,7 @@ class CompanyPeopleActivity : Activity() {
 
         search = EditText(this).apply {
             hint = "Search name, phone or service..."
-            singleLine = true
+            setSingleLine(true)
             setTextColor(if (Ui.isDark(this@CompanyPeopleActivity)) Color.WHITE else Color.BLACK)
             setHintTextColor(Ui.muted(this@CompanyPeopleActivity))
         }
