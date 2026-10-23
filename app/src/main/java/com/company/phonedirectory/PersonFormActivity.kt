@@ -91,7 +91,7 @@ class PersonFormActivity : Activity() {
             return edit
         }
 
-        fieldsMap = linkedMapOf()
+        private val fieldsMap = linkedMapOf<String, EditText>()
         field("name", "Nom et prénom *")
         field("phone", "Numéro de téléphone", true)
         field("service", "Service / Département")
