@@ -56,7 +56,7 @@ class SocietyActivity : Activity() {
 
         search = EditText(this).apply {
             hint = "Search company..."
-            singleLine = true
+            setSingleLine(true)
             setTextColor(if (Ui.isDark(this@SocietyActivity)) Color.WHITE else Color.BLACK)
             setHintTextColor(Ui.muted(this@SocietyActivity))
             setPadding(dp(12), 0, dp(12), 0)
