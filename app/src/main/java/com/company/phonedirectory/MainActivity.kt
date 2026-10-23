@@ -61,6 +61,11 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.securityButton).setOnClickListener {
             startActivity(Intent(this, SecurityActivity::class.java))
         }
+        
+findViewById<Button>(R.id.societyButton).setOnClickListener {
+    startActivity(Intent(this, SocietyActivity::class.java))
+}
+
 
         search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
