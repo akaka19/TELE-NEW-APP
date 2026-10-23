@@ -71,11 +71,17 @@ class MainActivity : Activity() {
 
         search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
-                s: CharSequence?, start: Int, count: Int, after: Int
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
             ) {}
 
             override fun onTextChanged(
-                s: CharSequence?, start: Int, before: Int, count: Int
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
             ) {
                 query = s?.toString().orEmpty()
                 render()
@@ -89,6 +95,7 @@ class MainActivity : Activity() {
         if (menuPopup?.isShowing == true) return
 
         val dark = Ui.isDark(this)
+
         val panelColor = if (dark) {
             Color.rgb(15, 23, 42)
         } else {
@@ -184,8 +191,10 @@ class MainActivity : Activity() {
 
         panel.startAnimation(
             TranslateAnimation(
-                -dp(280).toFloat(), 0f,
-                0f, 0f
+                -dp(280).toFloat(),
+                0f,
+                0f,
+                0f
             ).apply {
                 duration = 220
                 fillAfter = false
@@ -256,7 +265,12 @@ class MainActivity : Activity() {
 
     private fun applyTheme() {
         val dark = Ui.isDark(this)
-        val textColor = if (dark) Color.WHITE else Color.rgb(25, 35, 50)
+
+        val textColor = if (dark) {
+            Color.WHITE
+        } else {
+            Color.rgb(25, 35, 50)
+        }
 
         findViewById<View>(R.id.mainRoot)
             .setBackgroundColor(Ui.background(this))
@@ -264,7 +278,10 @@ class MainActivity : Activity() {
         directoryTitle.setTextColor(textColor)
         contactsTitle.setTextColor(textColor)
         count.setTextColor(textColor)
-        empty.setTextColor(if (dark) Color.WHITE else Color.DKGRAY)
+
+        empty.setTextColor(
+            if (dark) Color.WHITE else Color.DKGRAY
+        )
 
         search.setTextColor(textColor)
         search.setHintTextColor(Ui.muted(this))
@@ -285,7 +302,13 @@ class MainActivity : Activity() {
         if (contacts.isEmpty()) return
 
         val dark = Ui.isDark(this)
-        val textColor = if (dark) Color.WHITE else Color.rgb(25, 35, 50)
+
+        val textColor = if (dark) {
+            Color.WHITE
+        } else {
+            Color.rgb(25, 35, 50)
+        }
+
         val mutedColor = if (dark) {
             Color.rgb(160, 174, 192)
         } else {
@@ -305,7 +328,11 @@ class MainActivity : Activity() {
                 if (index >= contacts.size) {
                     row.addView(
                         View(this),
-                        LinearLayout.LayoutParams(0, dp(142), 1f).apply {
+                        LinearLayout.LayoutParams(
+                            0,
+                            dp(142),
+                            1f
+                        ).apply {
                             setMargins(dp(4), dp(5), dp(4), dp(7))
                         }
                     )
@@ -313,9 +340,12 @@ class MainActivity : Activity() {
                 }
 
                 val contact = contacts[index]
+
                 val label = contact.name.ifBlank {
                     contact.service.ifBlank {
-                        contact.beneficiary.ifBlank { "Extension" }
+                        contact.beneficiary.ifBlank {
+                            "Extension"
+                        }
                     }
                 }
 
@@ -323,10 +353,11 @@ class MainActivity : Activity() {
                     orientation = LinearLayout.VERTICAL
                     gravity = Gravity.CENTER_HORIZONTAL
                     setPadding(dp(7), dp(12), dp(7), dp(10))
-                    background = roundedBackground(
-                        Ui.card(this@MainActivity),
-                        18
-                    )
+
+                    // Ui.card() كترجع Drawable، ماشي Int.
+                    // استعملناها مباشرة لتفادي خطأ النوع.
+                    background = Ui.card(this@MainActivity)
+
                     elevation = dp(2).toFloat()
                     isClickable = true
                     isFocusable = true
@@ -346,9 +377,13 @@ class MainActivity : Activity() {
                     textSize = 22f
                     gravity = Gravity.CENTER
                     setTextColor(accent)
+
                     background = roundedBackground(
-                        if (dark) Color.rgb(25, 49, 68)
-                        else Color.rgb(225, 246, 251),
+                        if (dark) {
+                            Color.rgb(25, 49, 68)
+                        } else {
+                            Color.rgb(225, 246, 251)
+                        },
                         13
                     )
                 }
@@ -366,8 +401,11 @@ class MainActivity : Activity() {
 
                 val separator = View(this).apply {
                     setBackgroundColor(
-                        if (dark) Color.rgb(55, 72, 91)
-                        else Color.rgb(225, 231, 239)
+                        if (dark) {
+                            Color.rgb(55, 72, 91)
+                        } else {
+                            Color.rgb(225, 231, 239)
+                        }
                     )
                 }
 
@@ -397,7 +435,8 @@ class MainActivity : Activity() {
                 card.addView(
                     separator,
                     LinearLayout.LayoutParams(
-                        dp(34), dp(2)
+                        dp(34),
+                        dp(2)
                     ).apply {
                         topMargin = dp(8)
                     }
@@ -414,7 +453,11 @@ class MainActivity : Activity() {
 
                 row.addView(
                     card,
-                    LinearLayout.LayoutParams(0, dp(142), 1f).apply {
+                    LinearLayout.LayoutParams(
+                        0,
+                        dp(142),
+                        1f
+                    ).apply {
                         setMargins(dp(4), dp(5), dp(4), dp(7))
                     }
                 )
