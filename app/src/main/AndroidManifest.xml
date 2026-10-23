@@ -42,13 +42,12 @@
             android:exported="false" />
 
         <activity
-            android:name=".LockActivity"
-            android:exported="true">
-
-        <activity
             android:name=".ImportExportActivity"
             android:exported="false" />
-            
+
+        <activity
+            android:name=".LockActivity"
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,4 +57,5 @@
         </activity>
 
     </application>
+
 </manifest>
