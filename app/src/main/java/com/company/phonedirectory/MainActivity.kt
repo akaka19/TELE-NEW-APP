@@ -29,6 +29,7 @@ class MainActivity : Activity() {
     private lateinit var search: EditText
     private lateinit var directoryTitle: TextView
     private lateinit var contactsTitle: TextView
+    private lateinit var appUpdater: AppUpdater
 
     private var query = ""
     private var menuPopup: PopupWindow? = null
@@ -40,6 +41,7 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
 
         db = DatabaseHelper(this)
+        appUpdater = AppUpdater(this)
 
         list = findViewById(R.id.contactList)
         count = findViewById(R.id.contactCount)
@@ -49,6 +51,9 @@ class MainActivity : Activity() {
         contactsTitle = findViewById(R.id.contactsTitle)
 
         applyTheme()
+
+        // Check GitHub Releases when the app opens.
+        appUpdater.checkForUpdate()
 
         findViewById<Button>(R.id.addButton).setOnClickListener {
             startActivity(Intent(this, AddEditActivity::class.java))
@@ -260,6 +265,11 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         menuPopup?.dismiss()
         menuPopup = null
+
+        if (::appUpdater.isInitialized) {
+            appUpdater.cleanup()
+        }
+
         super.onDestroy()
     }
 
@@ -353,11 +363,7 @@ class MainActivity : Activity() {
                     orientation = LinearLayout.VERTICAL
                     gravity = Gravity.CENTER_HORIZONTAL
                     setPadding(dp(7), dp(12), dp(7), dp(10))
-
-                    // Ui.card() كترجع Drawable، ماشي Int.
-                    // استعملناها مباشرة لتفادي خطأ النوع.
                     background = Ui.card(this@MainActivity)
-
                     elevation = dp(2).toFloat()
                     isClickable = true
                     isFocusable = true
