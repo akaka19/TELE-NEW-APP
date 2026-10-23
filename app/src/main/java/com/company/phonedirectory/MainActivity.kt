@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
@@ -31,6 +32,8 @@ class MainActivity : Activity() {
 
     private var query = ""
     private var menuPopup: PopupWindow? = null
+
+    private val accent = Color.rgb(53, 215, 242)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +69,6 @@ class MainActivity : Activity() {
             recreate()
         }
 
-        
-
         search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
                 s: CharSequence?, start: Int, count: Int, after: Int
@@ -88,7 +89,6 @@ class MainActivity : Activity() {
         if (menuPopup?.isShowing == true) return
 
         val dark = Ui.isDark(this)
-
         val panelColor = if (dark) {
             Color.rgb(15, 23, 42)
         } else {
@@ -96,7 +96,6 @@ class MainActivity : Activity() {
         }
 
         val textColor = if (dark) Color.WHITE else Color.BLACK
-        val accent = Color.rgb(53, 215, 242)
 
         val panel = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -119,25 +118,16 @@ class MainActivity : Activity() {
             setPadding(0, dp(5), 0, dp(24))
         })
 
-        // Directory
-        addMenuItem(
-            panel, "▦", "Directory", textColor, accent
-        ) {
+        addMenuItem(panel, "▦", "Directory", textColor) {
             menuPopup?.dismiss()
         }
 
-        // Société
-        addMenuItem(
-            panel, "▣", "Société", textColor, accent
-        ) {
+        addMenuItem(panel, "▣", "Société", textColor) {
             menuPopup?.dismiss()
             startActivity(Intent(this, SocietyActivity::class.java))
         }
 
-        // Import Contacts
-        addMenuItem(
-            panel, "⇧", "Import Contacts", textColor, accent
-        ) {
+        addMenuItem(panel, "⇧", "Import Contacts", textColor) {
             menuPopup?.dismiss()
             startActivity(
                 Intent(this, ImportExportActivity::class.java)
@@ -145,10 +135,7 @@ class MainActivity : Activity() {
             )
         }
 
-        // Export Contacts
-        addMenuItem(
-            panel, "⇩", "Export Contacts", textColor, accent
-        ) {
+        addMenuItem(panel, "⇩", "Export Contacts", textColor) {
             menuPopup?.dismiss()
             startActivity(
                 Intent(this, ImportExportActivity::class.java)
@@ -156,17 +143,13 @@ class MainActivity : Activity() {
             )
         }
 
-        // Settings
-        addMenuItem(
-            panel, "⚙", "Settings", textColor, accent
-        ) {
+        addMenuItem(panel, "⚙", "Settings", textColor) {
             menuPopup?.dismiss()
             startActivity(Intent(this, SecurityActivity::class.java))
         }
 
-        val spacer = View(this)
         panel.addView(
-            spacer,
+            View(this),
             LinearLayout.LayoutParams(1, 0, 1f)
         )
 
@@ -188,10 +171,7 @@ class MainActivity : Activity() {
         popup.setBackgroundDrawable(ColorDrawable(panelColor))
         popup.isOutsideTouchable = true
         popup.elevation = dp(18).toFloat()
-
-        popup.setOnDismissListener {
-            menuPopup = null
-        }
+        popup.setOnDismissListener { menuPopup = null }
 
         menuPopup = popup
 
@@ -202,15 +182,15 @@ class MainActivity : Activity() {
             0
         )
 
-        val animation = TranslateAnimation(
-            -dp(280).toFloat(), 0f,
-            0f, 0f
-        ).apply {
-            duration = 220
-            fillAfter = false
-        }
-
-        panel.startAnimation(animation)
+        panel.startAnimation(
+            TranslateAnimation(
+                -dp(280).toFloat(), 0f,
+                0f, 0f
+            ).apply {
+                duration = 220
+                fillAfter = false
+            }
+        )
     }
 
     private fun addMenuItem(
@@ -218,7 +198,6 @@ class MainActivity : Activity() {
         symbol: String,
         title: String,
         textColor: Int,
-        accent: Int,
         action: () -> Unit
     ) {
         val item = LinearLayout(this).apply {
@@ -277,7 +256,7 @@ class MainActivity : Activity() {
 
     private fun applyTheme() {
         val dark = Ui.isDark(this)
-        val textColor = if (dark) Color.WHITE else Color.BLACK
+        val textColor = if (dark) Color.WHITE else Color.rgb(25, 35, 50)
 
         findViewById<View>(R.id.mainRoot)
             .setBackgroundColor(Ui.background(this))
@@ -306,8 +285,12 @@ class MainActivity : Activity() {
         if (contacts.isEmpty()) return
 
         val dark = Ui.isDark(this)
-        val textColor = if (dark) Color.WHITE else Color.BLACK
-        val mutedColor = if (dark) Ui.muted(this) else Color.DKGRAY
+        val textColor = if (dark) Color.WHITE else Color.rgb(25, 35, 50)
+        val mutedColor = if (dark) {
+            Color.rgb(160, 174, 192)
+        } else {
+            Color.rgb(95, 108, 125)
+        }
 
         var index = 0
 
@@ -319,92 +302,124 @@ class MainActivity : Activity() {
             }
 
             for (column in 0 until 3) {
-                if (index < contacts.size) {
-                    val contact = contacts[index]
-
-                    val card = LinearLayout(this).apply {
-                        orientation = LinearLayout.VERTICAL
-                        gravity = Gravity.CENTER
-                        setPadding(dp(5), dp(12), dp(5), dp(12))
-                        background = Ui.card(this@MainActivity)
-                        isClickable = true
-                        isFocusable = true
-
-                        setOnClickListener {
-                            startActivity(
-                                Intent(
-                                    this@MainActivity,
-                                    ContactDetailActivity::class.java
-                                ).putExtra("contact_id", contact.id)
-                            )
-                        }
-                    }
-
-                    val phoneIcon = TextView(this).apply {
-                        text = "☎"
-                        textSize = 25f
-                        gravity = Gravity.CENTER
-                        setTextColor(0xFF35D7F2.toInt())
-                    }
-
-                    val number = TextView(this).apply {
-                        text = contact.phoneNumber
-                        textSize = 15f
-                        typeface = Typeface.DEFAULT_BOLD
-                        gravity = Gravity.CENTER
-                        setTextColor(textColor)
-                        maxLines = 1
-                    }
-
-                    val label = TextView(this).apply {
-                        text = contact.name.ifBlank {
-                            contact.service.ifBlank {
-                                contact.beneficiary.ifBlank {
-                                    "Extension"
-                                }
-                            }
-                        }
-                        textSize = 12f
-                        gravity = Gravity.CENTER
-                        setTextColor(mutedColor)
-                        maxLines = 2
-                    }
-
-                    card.addView(
-                        phoneIcon,
-                        LinearLayout.LayoutParams(-1, dp(34))
-                    )
-
-                    card.addView(
-                        number,
-                        LinearLayout.LayoutParams(-1, -2).apply {
-                            topMargin = dp(5)
-                        }
-                    )
-
-                    card.addView(
-                        label,
-                        LinearLayout.LayoutParams(-1, -2).apply {
-                            topMargin = dp(4)
-                        }
-                    )
-
-                    row.addView(
-                        card,
-                        LinearLayout.LayoutParams(0, dp(112), 1f).apply {
-                            setMargins(dp(4), dp(4), dp(4), dp(8))
-                        }
-                    )
-
-                    index++
-                } else {
+                if (index >= contacts.size) {
                     row.addView(
                         View(this),
-                        LinearLayout.LayoutParams(0, dp(112), 1f).apply {
-                            setMargins(dp(4), dp(4), dp(4), dp(8))
+                        LinearLayout.LayoutParams(0, dp(142), 1f).apply {
+                            setMargins(dp(4), dp(5), dp(4), dp(7))
                         }
                     )
+                    continue
                 }
+
+                val contact = contacts[index]
+                val label = contact.name.ifBlank {
+                    contact.service.ifBlank {
+                        contact.beneficiary.ifBlank { "Extension" }
+                    }
+                }
+
+                val card = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = Gravity.CENTER_HORIZONTAL
+                    setPadding(dp(7), dp(12), dp(7), dp(10))
+                    background = roundedBackground(
+                        Ui.card(this@MainActivity),
+                        18
+                    )
+                    elevation = dp(2).toFloat()
+                    isClickable = true
+                    isFocusable = true
+
+                    setOnClickListener {
+                        startActivity(
+                            Intent(
+                                this@MainActivity,
+                                ContactDetailActivity::class.java
+                            ).putExtra("contact_id", contact.id)
+                        )
+                    }
+                }
+
+                val iconHolder = TextView(this).apply {
+                    text = "☎"
+                    textSize = 22f
+                    gravity = Gravity.CENTER
+                    setTextColor(accent)
+                    background = roundedBackground(
+                        if (dark) Color.rgb(25, 49, 68)
+                        else Color.rgb(225, 246, 251),
+                        13
+                    )
+                }
+
+                val number = TextView(this).apply {
+                    text = contact.phoneNumber
+                    textSize = 16f
+                    typeface = Typeface.DEFAULT_BOLD
+                    gravity = Gravity.CENTER
+                    setTextColor(textColor)
+                    maxLines = 1
+                    setPadding(0, dp(7), 0, 0)
+                    includeFontPadding = false
+                }
+
+                val separator = View(this).apply {
+                    setBackgroundColor(
+                        if (dark) Color.rgb(55, 72, 91)
+                        else Color.rgb(225, 231, 239)
+                    )
+                }
+
+                val name = TextView(this).apply {
+                    text = label
+                    textSize = 12f
+                    typeface = Typeface.DEFAULT_BOLD
+                    gravity = Gravity.CENTER
+                    setTextColor(mutedColor)
+                    maxLines = 2
+                    setPadding(dp(1), dp(7), dp(1), 0)
+                }
+
+                card.addView(
+                    iconHolder,
+                    LinearLayout.LayoutParams(dp(42), dp(42))
+                )
+
+                card.addView(
+                    number,
+                    LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                )
+
+                card.addView(
+                    separator,
+                    LinearLayout.LayoutParams(
+                        dp(34), dp(2)
+                    ).apply {
+                        topMargin = dp(8)
+                    }
+                )
+
+                card.addView(
+                    name,
+                    LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0,
+                        1f
+                    )
+                )
+
+                row.addView(
+                    card,
+                    LinearLayout.LayoutParams(0, dp(142), 1f).apply {
+                        setMargins(dp(4), dp(5), dp(4), dp(7))
+                    }
+                )
+
+                index++
             }
 
             list.addView(
@@ -414,6 +429,16 @@ class MainActivity : Activity() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             )
+        }
+    }
+
+    private fun roundedBackground(
+        color: Int,
+        radius: Int
+    ): GradientDrawable {
+        return GradientDrawable().apply {
+            setColor(color)
+            cornerRadius = dp(radius).toFloat()
         }
     }
 
