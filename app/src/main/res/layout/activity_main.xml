@@ -163,6 +163,19 @@
     </FrameLayout>
 
     <!-- Add contact -->
+    
+<Button
+    android:id="@+id/societyButton"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_marginTop="8dp"
+    android:backgroundTint="#8B7CFF"
+    android:text="▦  Société"
+    android:textAllCaps="false"
+    android:textColor="#FFFFFF"
+    android:textSize="15sp"
+    android:textStyle="bold" />
+
     <Button
         android:id="@+id/addButton"
         android:layout_width="match_parent"
