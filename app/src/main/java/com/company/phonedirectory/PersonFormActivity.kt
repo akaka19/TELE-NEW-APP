@@ -5,7 +5,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.graphics.Color
 import android.text.InputType
-import android.view.View
+import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -16,12 +16,13 @@ import android.widget.Toast
 class PersonFormActivity : Activity() {
 
     private lateinit var db: DatabaseHelper
-    private lateinit var fields: Map<String, EditText>
+    private val fieldsMap = linkedMapOf<String, EditText>()
+
     private var companyId = 0L
     private var personId = 0L
     private var companyName = ""
 
-    private fun dp(v: Int) =
+    private fun dp(v: Int): Int =
         (v * resources.displayMetrics.density).toInt()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +48,10 @@ class PersonFormActivity : Activity() {
         }
 
         form.addView(TextView(this).apply {
-            text = if (personId == 0L) "Ajouter une personne" else "Modifier la personne"
+            text = if (personId == 0L)
+                "Ajouter une personne"
+            else
+                "Modifier la personne"
             textSize = 26f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setTextColor(textColor)
@@ -60,38 +64,52 @@ class PersonFormActivity : Activity() {
             setPadding(0, dp(8), 0, dp(12))
         })
 
-        fun field(key: String, hint: String, phone: Boolean = false): EditText {
+        fieldsMap.clear()
+
+        fun field(
+            key: String,
+            hintText: String,
+            phone: Boolean = false
+        ): EditText {
             val edit = EditText(this).apply {
-                this.hint = hint
+                hint = hintText
                 textSize = 16f
                 setTextColor(textColor)
                 setHintTextColor(Ui.muted(this@PersonFormActivity))
                 setPadding(dp(13), dp(8), dp(13), dp(8))
-                if (phone) {
-                    inputType = InputType.TYPE_CLASS_PHONE
+
+                inputType = if (phone) {
+                    InputType.TYPE_CLASS_PHONE
                 } else {
-                    inputType = InputType.TYPE_CLASS_TEXT or
+                    InputType.TYPE_CLASS_TEXT or
                         InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                 }
+
                 if (key != "notes") {
                     setSingleLine(true)
                 } else {
                     minLines = 3
-                    gravity = android.view.Gravity.TOP
+                    gravity = Gravity.TOP
                 }
+
                 background = Ui.card(this@PersonFormActivity)
             }
+
             fieldsMap[key] = edit
+
             form.addView(
                 edit,
-                LinearLayout.LayoutParams(-1, if (key == "notes") dp(100) else dp(54)).apply {
+                LinearLayout.LayoutParams(
+                    -1,
+                    if (key == "notes") dp(100) else dp(54)
+                ).apply {
                     bottomMargin = dp(10)
                 }
             )
+
             return edit
         }
 
-        private val fieldsMap = linkedMapOf<String, EditText>()
         field("name", "Nom et prénom *")
         field("phone", "Numéro de téléphone", true)
         field("service", "Service / Département")
@@ -116,30 +134,34 @@ class PersonFormActivity : Activity() {
 
         if (personId != 0L) {
             val person = db.getPersonById(personId)
+
             if (person == null) {
+                Toast.makeText(
+                    this,
+                    "Personne introuvable",
+                    Toast.LENGTH_SHORT
+                ).show()
                 finish()
                 return
             }
+
             fieldsMap["name"]?.setText(person.name)
             fieldsMap["phone"]?.setText(person.phoneNumber)
             fieldsMap["service"]?.setText(person.service)
             fieldsMap["notes"]?.setText(person.notes)
+
             companyId = person.companyId
         }
-
-        fields = fieldsMap
     }
 
-    private val fieldsMap = linkedMapOf<String, EditText>()
-
     private fun savePerson() {
-        val name = fields["name"]?.text?.toString()?.trim().orEmpty()
-        val phone = fields["phone"]?.text?.toString()?.trim().orEmpty()
-        val service = fields["service"]?.text?.toString()?.trim().orEmpty()
-        val notes = fields["notes"]?.text?.toString()?.trim().orEmpty()
+        val name = fieldsMap["name"]?.text?.toString()?.trim().orEmpty()
+        val phone = fieldsMap["phone"]?.text?.toString()?.trim().orEmpty()
+        val service = fieldsMap["service"]?.text?.toString()?.trim().orEmpty()
+        val notes = fieldsMap["notes"]?.text?.toString()?.trim().orEmpty()
 
         if (name.isBlank()) {
-            fields["name"]?.error = "Le nom est obligatoire"
+            fieldsMap["name"]?.error = "Le nom est obligatoire"
             return
         }
 
@@ -155,7 +177,9 @@ class PersonFormActivity : Activity() {
         db.savePerson(person)
             .onSuccess {
                 Toast.makeText(
-                    this, "Personne enregistrée", Toast.LENGTH_SHORT
+                    this,
+                    "Personne enregistrée",
+                    Toast.LENGTH_SHORT
                 ).show()
                 finish()
             }
