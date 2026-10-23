@@ -90,6 +90,7 @@ class MainActivity : Activity() {
         if (menuPopup?.isShowing == true) return
 
         val dark = Ui.isDark(this)
+
         val panelColor = if (dark) {
             Color.rgb(15, 23, 42)
         } else {
@@ -120,12 +121,14 @@ class MainActivity : Activity() {
             setPadding(0, dp(5), 0, dp(24))
         })
 
+        // Directory
         addMenuItem(
             panel, "▦", "Directory", textColor, accent
         ) {
             menuPopup?.dismiss()
         }
 
+        // Société
         addMenuItem(
             panel, "▣", "Société", textColor, accent
         ) {
@@ -133,6 +136,29 @@ class MainActivity : Activity() {
             startActivity(Intent(this, SocietyActivity::class.java))
         }
 
+        // Import Contacts
+        addMenuItem(
+            panel, "⇧", "Import Contacts", textColor, accent
+        ) {
+            menuPopup?.dismiss()
+            startActivity(
+                Intent(this, ImportExportActivity::class.java)
+                    .putExtra("mode", "import")
+            )
+        }
+
+        // Export Contacts
+        addMenuItem(
+            panel, "⇩", "Export Contacts", textColor, accent
+        ) {
+            menuPopup?.dismiss()
+            startActivity(
+                Intent(this, ImportExportActivity::class.java)
+                    .putExtra("mode", "export")
+            )
+        }
+
+        // Settings
         addMenuItem(
             panel, "⚙", "Settings", textColor, accent
         ) {
@@ -207,21 +233,27 @@ class MainActivity : Activity() {
             setOnClickListener { action() }
         }
 
-        item.addView(TextView(this).apply {
-            text = symbol
-            textSize = 22f
-            gravity = Gravity.CENTER
-            setTextColor(accent)
-        }, LinearLayout.LayoutParams(dp(38), dp(52)))
+        item.addView(
+            TextView(this).apply {
+                text = symbol
+                textSize = 22f
+                gravity = Gravity.CENTER
+                setTextColor(accent)
+            },
+            LinearLayout.LayoutParams(dp(38), dp(52))
+        )
 
-        item.addView(TextView(this).apply {
-            text = title
-            textSize = 16f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(textColor)
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(10), 0, 0, 0)
-        }, LinearLayout.LayoutParams(0, dp(52), 1f))
+        item.addView(
+            TextView(this).apply {
+                text = title
+                textSize = 16f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(textColor)
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(10), 0, 0, 0)
+            },
+            LinearLayout.LayoutParams(0, dp(52), 1f)
+        )
 
         panel.addView(
             item,
