@@ -126,6 +126,11 @@ class MainActivity : Activity() {
 
         // Directory heading and menu item removed.
 
+        addMenuItem(panel, "☎", "SIP Calling", textColor) {
+            menuPopup?.dismiss()
+            startActivity(Intent(this, SIPActivity::class.java))
+        }
+
         addMenuItem(panel, "▣", "Société", textColor) {
             menuPopup?.dismiss()
             startActivity(Intent(this, SocietyActivity::class.java))

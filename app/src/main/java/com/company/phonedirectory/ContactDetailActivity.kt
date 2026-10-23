@@ -47,6 +47,15 @@ class ContactDetailActivity : Activity() {
             }
         }
 
+        findViewById<Button>(R.id.sipCallButton).setOnClickListener {
+            current?.let { contact ->
+                startActivity(
+                    Intent(this, SIPActivity::class.java)
+                        .putExtra("dial_number", contact.phoneNumber)
+                )
+            }
+        }
+
         findViewById<Button>(R.id.copyButton).setOnClickListener {
             current?.let { contact ->
                 val clipboard =
@@ -127,7 +136,7 @@ class ContactDetailActivity : Activity() {
         }
 
         styleButton(findViewById(R.id.callButton), green)
-        styleButton(findViewById(R.id.copyButton), cyan)
+        styleButton(findViewById(R.id.sipCallButton), green)\n        styleButton(findViewById(R.id.copyButton), cyan)
         styleButton(findViewById(R.id.editButton), cyan)
         styleButton(findViewById(R.id.deleteButton), red)
 
