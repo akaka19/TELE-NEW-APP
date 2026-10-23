@@ -104,7 +104,9 @@ class ContactDetailActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        if (::db.isInitialized) render()
+        if (::db.isInitialized) {
+            render()
+        }
     }
 
     private fun render() {
@@ -136,7 +138,8 @@ class ContactDetailActivity : Activity() {
         }
 
         styleButton(findViewById(R.id.callButton), green)
-        styleButton(findViewById(R.id.sipCallButton), green)\n        styleButton(findViewById(R.id.copyButton), cyan)
+        styleButton(findViewById(R.id.sipCallButton), green)
+        styleButton(findViewById(R.id.copyButton), cyan)
         styleButton(findViewById(R.id.editButton), cyan)
         styleButton(findViewById(R.id.deleteButton), red)
 
@@ -201,8 +204,6 @@ class ContactDetailActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(14), dp(14), dp(14), dp(14))
-
-            // تصحيح الخطأ: الدالة كتستقبل لون Int
             background = roundedBackground(cardColor, 16)
         }
 
