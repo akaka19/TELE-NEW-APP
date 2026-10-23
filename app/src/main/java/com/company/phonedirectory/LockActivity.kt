@@ -8,6 +8,7 @@ import android.util.Base64
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -28,8 +29,8 @@ class LockActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // If no PIN has been configured, continue to the main screen.
-        if (!prefs.getBoolean("pin_enabled", false)) {
+        // Match the setting saved by SecurityActivity.kt
+        if (!prefs.getBoolean("enabled", false)) {
             openMain()
             return
         }
@@ -41,133 +42,110 @@ class LockActivity : FragmentActivity() {
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setPadding(40, 40, 40, 40)
+            setPadding(32, 32, 32, 32)
             setBackgroundColor(android.graphics.Color.rgb(15, 23, 42))
         }
 
-        val title = TextView(this).apply {
+        root.addView(TextView(this).apply {
             text = "HiPath Directory"
             textSize = 26f
             gravity = Gravity.CENTER
             setTextColor(android.graphics.Color.WHITE)
-        }
+        })
 
-        val subtitle = TextView(this).apply {
+        root.addView(TextView(this).apply {
             text = "Unlock to continue"
             textSize = 16f
             gravity = Gravity.CENTER
             setTextColor(android.graphics.Color.LTGRAY)
-            setPadding(0, 16, 0, 28)
-        }
+            setPadding(0, 16, 0, 24)
+        })
 
-        val pinInput = android.widget.EditText(this).apply {
+        val pinInput = EditText(this).apply {
             hint = "Enter PIN"
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER or
-                android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            inputType = 18
             setSingleLine(true)
             setTextColor(android.graphics.Color.WHITE)
             setHintTextColor(android.graphics.Color.LTGRAY)
         }
 
-        val unlockButton = Button(this).apply {
+        root.addView(pinInput, matchWidth())
+
+        root.addView(Button(this).apply {
             text = "Unlock with PIN"
             setOnClickListener {
                 val pin = pinInput.text.toString()
-                if (pin.isBlank()) {
-                    pinInput.error = "Enter your PIN"
-                } else if (verifyPin(pin)) {
+                if (verifyPin(pin)) {
                     openMain()
                 } else {
-                    pinInput.text?.clear()
-                    Toast.makeText(
-                        this@LockActivity,
-                        "Incorrect PIN",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    pinInput.text.clear()
+                    pinInput.error = "Incorrect PIN"
                 }
             }
-        }
+        }, matchWidth())
 
-        val biometricButton = Button(this).apply {
+        val biometricEnabled = prefs.getBoolean("biometric", false)
+        val biometricAvailable = biometricAvailable()
+
+        root.addView(Button(this).apply {
             text = "Unlock with fingerprint"
-            setOnClickListener {
-                authenticateBiometric()
-            }
-        }
+            isEnabled = biometricEnabled && biometricAvailable
+            setOnClickListener { authenticateBiometric() }
+        }, matchWidth())
 
-        root.addView(
-            title,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        root.addView(
-            subtitle,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        root.addView(
-            pinInput,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        root.addView(
-            unlockButton,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        root.addView(
-            biometricButton,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
+        if (biometricEnabled && !biometricAvailable) {
+            root.addView(TextView(this).apply {
+                text = "Fingerprint unavailable. Use your PIN."
+                setTextColor(android.graphics.Color.LTGRAY)
+                gravity = Gravity.CENTER
+            })
+        }
 
         setContentView(root)
 
-        if (!biometricAvailable()) {
-            biometricButton.isEnabled = false
-            biometricButton.text = "Fingerprint unavailable — use PIN"
+        if (biometricEnabled && biometricAvailable) {
+            // Show the real Android biometric prompt on the lock screen.
+            authenticateBiometric()
         }
     }
 
+    private fun matchWidth(): LinearLayout.LayoutParams =
+        LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            bottomMargin = 12
+        }
+
     private fun biometricAvailable(): Boolean {
-        val manager = BiometricManager.from(this)
-        return manager.canAuthenticate(
+        val authenticators =
             BiometricManager.Authenticators.BIOMETRIC_STRONG or
                 BiometricManager.Authenticators.BIOMETRIC_WEAK
-        ) == BiometricManager.BIOMETRIC_SUCCESS
+
+        return BiometricManager.from(this)
+            .canAuthenticate(authenticators) ==
+            BiometricManager.BIOMETRIC_SUCCESS
     }
 
     private fun authenticateBiometric() {
-        if (!biometricAvailable()) {
+        if (!prefs.getBoolean("biometric", false) || !biometricAvailable()) {
             Toast.makeText(
                 this,
-                "Fingerprint is unavailable. Use your PIN.",
-                Toast.LENGTH_LONG
+                "Fingerprint unavailable. Use your PIN.",
+                Toast.LENGTH_SHORT
             ).show()
             return
         }
 
-        val executor = ContextCompat.getMainExecutor(this)
-
         val prompt = BiometricPrompt(
             this,
-            executor,
+            ContextCompat.getMainExecutor(this),
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(
                     result: BiometricPrompt.AuthenticationResult
                 ) {
                     super.onAuthenticationSucceeded(result)
-                    openMain()
+                    runOnUiThread { openMain() }
                 }
 
                 override fun onAuthenticationFailed() {
@@ -193,7 +171,7 @@ class LockActivity : FragmentActivity() {
             }
         )
 
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        val info = BiometricPrompt.PromptInfo.Builder()
             .setTitle("HiPath Directory")
             .setSubtitle("Verify your identity")
             .setAllowedAuthenticators(
@@ -203,34 +181,34 @@ class LockActivity : FragmentActivity() {
             .setNegativeButtonText("Cancel")
             .build()
 
-        prompt.authenticate(promptInfo)
+        prompt.authenticate(info)
     }
 
     private fun verifyPin(pin: String): Boolean {
+        if (pin.isEmpty()) return false
+
         return try {
-            val saltString = prefs.getString("salt", null) ?: return false
-            val hashString = prefs.getString("hash", null) ?: return false
+            val saltText = prefs.getString("salt", null) ?: return false
+            val hashText = prefs.getString("hash", null) ?: return false
 
-            val salt = Base64.decode(saltString, Base64.NO_WRAP)
-            val expectedHash = Base64.decode(hashString, Base64.NO_WRAP)
+            val salt = Base64.decode(saltText, Base64.NO_WRAP)
+            val expected = Base64.decode(hashText, Base64.NO_WRAP)
+            val actual = hashPin(pin, salt)
 
-            val spec = PBEKeySpec(
-                pin.toCharArray(),
-                salt,
-                120000,
-                256
-            )
-
-            val actualHash = SecretKeyFactory
-                .getInstance("PBKDF2WithHmacSHA256")
-                .generateSecret(spec)
-                .encoded
-
-            spec.clearPassword()
-
-            MessageDigest.isEqual(expectedHash, actualHash)
+            MessageDigest.isEqual(expected, actual)
         } catch (_: Exception) {
             false
+        }
+    }
+
+    private fun hashPin(pin: String, salt: ByteArray): ByteArray {
+        val spec = PBEKeySpec(pin.toCharArray(), salt, 120000, 256)
+        return try {
+            SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+                .generateSecret(spec)
+                .encoded
+        } finally {
+            spec.clearPassword()
         }
     }
 
