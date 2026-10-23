@@ -25,8 +25,8 @@
                 android:layout_height="wrap_content"
                 android:text="HIPATH / SYSTEMS"
                 android:textColor="#35D7F2"
-                android:textStyle="bold"
-                android:textSize="11sp" />
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/directoryTitle"
@@ -50,20 +50,20 @@
             android:id="@+id/securityButton"
             android:layout_width="52dp"
             android:layout_height="48dp"
+            android:layout_marginStart="5dp"
             android:text="⚙"
             android:backgroundTint="#202A42"
-            android:textColor="#8B7CFF"
-            android:layout_marginStart="5dp" />
+            android:textColor="#8B7CFF" />
     </LinearLayout>
 
     <!-- Summary -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:layout_marginTop="18dp"
         android:background="@drawable/bg_summary">
 
         <LinearLayout
@@ -93,10 +93,10 @@
         <TextView
             android:layout_width="52dp"
             android:layout_height="52dp"
+            android:gravity="center"
             android:text="▦"
             android:textColor="#35D7F2"
-            android:textSize="30sp"
-            android:gravity="center" />
+            android:textSize="30sp" />
     </LinearLayout>
 
     <!-- Search -->
@@ -104,16 +104,16 @@
         android:id="@+id/searchInput"
         android:layout_width="match_parent"
         android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_input"
         android:hint="Search any contact field..."
-        android:singleLine="true"
-        android:textColor="#F4F7FF"
-        android:textColorHint="#8290AA"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_input" />
+        android:singleLine="true"
+        android:textColor="#F4F7FF"
+        android:textColorHint="#8290AA" />
 
-    <!-- Contacts heading -->
+    <!-- Contacts title -->
     <TextView
         android:id="@+id/contactsTitle"
         android:layout_width="match_parent"
@@ -158,12 +158,12 @@
         android:id="@+id/addButton"
         android:layout_width="match_parent"
         android:layout_height="54dp"
+        android:layout_marginTop="10dp"
         android:text="+  Add Contact"
         android:textAllCaps="false"
         android:textSize="16sp"
         android:textStyle="bold"
         android:backgroundTint="#35D7F2"
-        android:textColor="#0B1020"
-        android:layout_marginTop="10dp" />
+        android:textColor="#0B1020" />
 
 </LinearLayout>
