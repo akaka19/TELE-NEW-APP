@@ -23,6 +23,8 @@ class MainActivity : Activity() {
     private lateinit var count: TextView
     private lateinit var empty: TextView
     private lateinit var search: EditText
+    private lateinit var directoryTitle: TextView
+    private lateinit var contactsTitle: TextView
 
     private var query = ""
 
@@ -36,13 +38,13 @@ class MainActivity : Activity() {
         count = findViewById(R.id.contactCount)
         empty = findViewById(R.id.emptyText)
         search = findViewById(R.id.searchInput)
+        directoryTitle = findViewById(R.id.directoryTitle)
+        contactsTitle = findViewById(R.id.contactsTitle)
 
         applyTheme()
 
         findViewById<Button>(R.id.addButton).setOnClickListener {
-            startActivity(
-                Intent(this, AddEditActivity::class.java)
-            )
+            startActivity(Intent(this, AddEditActivity::class.java))
         }
 
         findViewById<Button>(R.id.themeButton).setOnClickListener {
@@ -57,25 +59,16 @@ class MainActivity : Activity() {
         }
 
         findViewById<Button>(R.id.securityButton).setOnClickListener {
-            startActivity(
-                Intent(this, SecurityActivity::class.java)
-            )
+            startActivity(Intent(this, SecurityActivity::class.java))
         }
 
         search.addTextChangedListener(object : TextWatcher {
-
             override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
+                s: CharSequence?, start: Int, count: Int, after: Int
             ) {}
 
             override fun onTextChanged(
-                s: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
+                s: CharSequence?, start: Int, before: Int, count: Int
             ) {
                 query = s?.toString().orEmpty()
                 render()
@@ -87,10 +80,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-
-        if (::db.isInitialized) {
-            render()
-        }
+        if (::db.isInitialized) render()
     }
 
     private fun applyTheme() {
@@ -100,13 +90,16 @@ class MainActivity : Activity() {
         findViewById<View>(R.id.mainRoot)
             .setBackgroundColor(Ui.background(this))
 
-        findViewById<Button>(R.id.themeButton).text =
-            if (dark) "☼" else "☾"
+        directoryTitle.setTextColor(textColor)
+        contactsTitle.setTextColor(textColor)
+        count.setTextColor(textColor)
+        empty.setTextColor(if (dark) Color.WHITE else Color.DKGRAY)
 
         search.setTextColor(textColor)
         search.setHintTextColor(Ui.muted(this))
-        count.setTextColor(textColor)
-        empty.setTextColor(textColor)
+
+        findViewById<Button>(R.id.themeButton).text =
+            if (dark) "☼" else "☾"
     }
 
     private fun render() {
@@ -118,18 +111,19 @@ class MainActivity : Activity() {
         empty.visibility =
             if (contacts.isEmpty()) View.VISIBLE else View.GONE
 
-        if (contacts.isEmpty()) {
-            return
-        }
+        if (contacts.isEmpty()) return
 
         val dark = Ui.isDark(this)
         val textColor = if (dark) Color.WHITE else Color.BLACK
-        val mutedColor = Ui.muted(this)
+        val mutedColor = if (dark) {
+            Ui.muted(this)
+        } else {
+            Color.DKGRAY
+        }
 
         var index = 0
 
         while (index < contacts.size) {
-
             val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.TOP
@@ -137,20 +131,13 @@ class MainActivity : Activity() {
             }
 
             for (column in 0 until 3) {
-
                 if (index < contacts.size) {
-
                     val contact = contacts[index]
 
                     val card = LinearLayout(this).apply {
                         orientation = LinearLayout.VERTICAL
                         gravity = Gravity.CENTER
-                        setPadding(
-                            dp(5),
-                            dp(12),
-                            dp(5),
-                            dp(12)
-                        )
+                        setPadding(dp(5), dp(12), dp(5), dp(12))
                         background = Ui.card(this@MainActivity)
                         isClickable = true
                         isFocusable = true
@@ -182,15 +169,13 @@ class MainActivity : Activity() {
                     }
 
                     val label = TextView(this).apply {
-                        text = contact.name
-                            .ifBlank {
-                                contact.service.ifBlank {
-                                    contact.beneficiary.ifBlank {
-                                        "Extension"
-                                    }
+                        text = contact.name.ifBlank {
+                            contact.service.ifBlank {
+                                contact.beneficiary.ifBlank {
+                                    "Extension"
                                 }
                             }
-
+                        }
                         textSize = 12f
                         gravity = Gravity.CENTER
                         setTextColor(mutedColor)
@@ -199,64 +184,36 @@ class MainActivity : Activity() {
 
                     card.addView(
                         phoneIcon,
-                        LinearLayout.LayoutParams(
-                            -1,
-                            dp(34)
-                        )
+                        LinearLayout.LayoutParams(-1, dp(34))
                     )
 
                     card.addView(
                         number,
-                        LinearLayout.LayoutParams(
-                            -1,
-                            -2
-                        ).apply {
+                        LinearLayout.LayoutParams(-1, -2).apply {
                             topMargin = dp(5)
                         }
                     )
 
                     card.addView(
                         label,
-                        LinearLayout.LayoutParams(
-                            -1,
-                            -2
-                        ).apply {
+                        LinearLayout.LayoutParams(-1, -2).apply {
                             topMargin = dp(4)
                         }
                     )
 
                     val cardParams = LinearLayout.LayoutParams(
-                        0,
-                        dp(112),
-                        1f
+                        0, dp(112), 1f
                     ).apply {
-                        setMargins(
-                            dp(4),
-                            dp(4),
-                            dp(4),
-                            dp(8)
-                        )
+                        setMargins(dp(4), dp(4), dp(4), dp(8))
                     }
 
                     row.addView(card, cardParams)
-
                     index++
-
                 } else {
-
                     row.addView(
                         View(this),
-                        LinearLayout.LayoutParams(
-                            0,
-                            dp(112),
-                            1f
-                        ).apply {
-                            setMargins(
-                                dp(4),
-                                dp(4),
-                                dp(4),
-                                dp(8)
-                            )
+                        LinearLayout.LayoutParams(0, dp(112), 1f).apply {
+                            setMargins(dp(4), dp(4), dp(4), dp(8))
                         }
                     )
                 }
@@ -273,8 +230,6 @@ class MainActivity : Activity() {
     }
 
     private fun dp(value: Int): Int {
-        return (
-            value * resources.displayMetrics.density
-        ).toInt()
+        return (value * resources.displayMetrics.density).toInt()
     }
 }
