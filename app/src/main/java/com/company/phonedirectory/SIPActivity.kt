@@ -1,4 +1,4 @@
-```kotlin
+
 package com.company.phonedirectory
 
 import android.Manifest
