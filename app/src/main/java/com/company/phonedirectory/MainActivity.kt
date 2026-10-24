@@ -115,6 +115,7 @@ class MainActivity : Activity() {
             setBackgroundColor(panelColor)
         }
 
+        // Header
         panel.addView(TextView(this).apply {
             text = "HIPATH"
             textSize = 12f
@@ -160,6 +161,7 @@ class MainActivity : Activity() {
             startActivity(Intent(this, AboutActivity::class.java))
         }
 
+        // Push footer to the bottom
         panel.addView(
             View(this),
             LinearLayout.LayoutParams(1, 0, 1f)
@@ -183,7 +185,9 @@ class MainActivity : Activity() {
         popup.setBackgroundDrawable(ColorDrawable(panelColor))
         popup.isOutsideTouchable = true
         popup.elevation = dp(18).toFloat()
-        popup.setOnDismissListener { menuPopup = null }
+        popup.setOnDismissListener {
+            menuPopup = null
+        }
 
         menuPopup = popup
 
@@ -221,7 +225,9 @@ class MainActivity : Activity() {
             background = Ui.card(this@MainActivity)
             isClickable = true
             isFocusable = true
-            setOnClickListener { action() }
+            setOnClickListener {
+                action()
+            }
         }
 
         item.addView(
@@ -259,7 +265,10 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        if (::db.isInitialized) render()
+
+        if (::db.isInitialized) {
+            render()
+        }
     }
 
     override fun onDestroy() {
