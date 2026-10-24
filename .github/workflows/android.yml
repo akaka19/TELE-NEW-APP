@@ -37,6 +37,24 @@ jobs:
           echo "$SIGNING_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/hipath-release.jks"
           test -s "$RUNNER_TEMP/hipath-release.jks"
 
+      - name: Diagnose Android Manifest
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+
+          path = "app/src/main/AndroidManifest.xml"
+          print(f"Checking {path}")
+
+          try:
+              ET.parse(path)
+              print("XML syntax: OK")
+          except ET.ParseError as error:
+              print(f"XML syntax ERROR: {error}")
+              raise
+          PY
+
+          gradle :app:processDebugMainManifest --stacktrace --info
+
       - name: Build APK
         env:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
