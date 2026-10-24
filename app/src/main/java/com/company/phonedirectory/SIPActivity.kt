@@ -87,7 +87,11 @@ class SIPActivity : Activity() {
                     if (incoming) View.VISIBLE else View.GONE
 
                 hangupButton.visibility =
-                    if (SIPEngine.hasActiveCall()) View.VISIBLE else View.GONE
+                    if (SIPEngine.hasActiveCall()) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
             }
         }
 
@@ -110,8 +114,11 @@ class SIPActivity : Activity() {
                 if (settingsVisible) View.VISIBLE else View.GONE
 
             settingsButton.text =
-                if (settingsVisible) "Hide SIP Settings"
-                else "SIP Settings"
+                if (settingsVisible) {
+                    "Hide SIP Settings"
+                } else {
+                    "SIP Settings"
+                }
         }
 
         connectButton.setOnClickListener {
@@ -143,8 +150,11 @@ class SIPActivity : Activity() {
             SIPEngine.setMicrophoneMuted(microphoneMuted)
 
             muteButton.text =
-                if (microphoneMuted) "Unmute microphone"
-                else "Mute microphone"
+                if (microphoneMuted) {
+                    "Unmute microphone"
+                } else {
+                    "Mute microphone"
+                }
         }
 
         speakerButton.setOnClickListener {
@@ -152,8 +162,11 @@ class SIPActivity : Activity() {
             SIPEngine.setSpeaker(speakerEnabled)
 
             speakerButton.text =
-                if (speakerEnabled) "Speaker: ON"
-                else "Speaker: OFF"
+                if (speakerEnabled) {
+                    "Speaker: ON"
+                } else {
+                    "Speaker: OFF"
+                }
         }
     }
 
@@ -165,7 +178,13 @@ class SIPActivity : Activity() {
         }
 
         val scroll = ScrollView(this)
-        scroll.addView(root)
+        scroll.addView(
+            root,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
 
         val title = TextView(this).apply {
             text = "SIP Calling"
@@ -397,10 +416,11 @@ class SIPActivity : Activity() {
         transportSpinner.setSelection(0)
     }
 
+    // Reads saved profiles and supports an older port stored as String or Int.
     private fun loadProfiles() {
         profiles.clear()
 
-        val stored = preferences.getString("profiles", null)
+        val stored = preferences.all["profiles"] as? String
 
         if (!stored.isNullOrBlank()) {
             try {
@@ -409,13 +429,16 @@ class SIPActivity : Activity() {
                 for (i in 0 until array.length()) {
                     val item = array.getJSONObject(i)
 
+                    val savedPort = item.optInt("port", 5060)
+                        .coerceIn(1, 65535)
+
                     profiles.add(
                         SipProfile(
                             name = item.optString("name"),
                             username = item.optString("username"),
                             domain = item.optString("domain"),
                             password = item.optString("password"),
-                            port = item.optInt("port", 5060),
+                            port = savedPort,
                             transport = item.optString(
                                 "transport",
                                 "UDP"
@@ -430,29 +453,37 @@ class SIPActivity : Activity() {
 
         if (profiles.isEmpty()) {
             val oldUsername =
-                preferences.getString("username", "").orEmpty()
+                preferences.all["username"] as? String ?: ""
 
             val oldDomain =
-                preferences.getString("domain", "").orEmpty()
+                preferences.all["domain"] as? String ?: ""
 
             if (
                 oldUsername.isNotBlank() &&
                 oldDomain.isNotBlank()
             ) {
+                val oldPort = when (
+                    val value = preferences.all["port"]
+                ) {
+                    is String -> value.toIntOrNull() ?: 5060
+                    is Int -> value
+                    else -> 5060
+                }.coerceIn(1, 65535)
+
+                val oldPassword =
+                    preferences.all["password"] as? String ?: ""
+
+                val oldTransport =
+                    preferences.all["transport"] as? String ?: "UDP"
+
                 profiles.add(
                     SipProfile(
                         name = "$oldUsername@$oldDomain",
                         username = oldUsername,
                         domain = oldDomain,
-                        password = preferences.getString(
-                            "password",
-                            ""
-                        ).orEmpty(),
-                        port = preferences.getInt("port", 5060),
-                        transport = preferences.getString(
-                            "transport",
-                            "UDP"
-                        ).orEmpty()
+                        password = oldPassword,
+                        port = oldPort,
+                        transport = oldTransport
                     )
                 )
 
@@ -570,8 +601,7 @@ class SIPActivity : Activity() {
         val profileName = "$username@$domain"
 
         val existingIndex = profiles.indexOfFirst {
-            it.username == username &&
-                it.domain == domain
+            it.username == username && it.domain == domain
         }
 
         val profile = SipProfile(
@@ -810,8 +840,7 @@ class SIPActivity : Activity() {
             params.serverAddress = server
             params.isRegisterEnabled = true
 
-            val account: Account =
-                newCore.createAccount(params)
+            val account: Account = newCore.createAccount(params)
 
             newCore.addAccount(account)
             newCore.defaultAccount = account
@@ -826,8 +855,7 @@ class SIPActivity : Activity() {
         }
 
         fun isConnected(): Boolean {
-            return core != null &&
-                core?.defaultAccount != null
+            return core != null && core?.defaultAccount != null
         }
 
         fun hasActiveCall(): Boolean {
