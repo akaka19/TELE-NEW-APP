@@ -28,6 +28,7 @@
             android:name=".SecurityActivity"
             android:exported="false" />
 
+        <!-- About page -->
         <activity
             android:name=".AboutActivity"
             android:exported="false" />
