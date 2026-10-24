@@ -303,7 +303,6 @@ accountCard.addView(connectButton, matchParams(4))
 val statusPanel = LinearLayout(this).apply {
     orientation = LinearLayout.VERTICAL
     setPadding(dp(12), dp(12), dp(12), dp(12))
-    minimumHeight = dp(76)
     background = rounded(
         if (dark) Color.rgb(13, 43, 48)
         else Color.rgb(232, 249, 247),
@@ -311,29 +310,45 @@ val statusPanel = LinearLayout(this).apply {
     )
 }
 
-statusPanel.addView(TextView(this).apply {
+val statusTitle = TextView(this).apply {
     text = "CONNECTION STATUS"
     textSize = 10f
     typeface = Typeface.DEFAULT_BOLD
     setTextColor(mutedColor)
-    includeFontPadding = true
-    maxLines = 1
-})
+    visibility = View.VISIBLE
+}
+
+statusPanel.addView(
+    statusTitle,
+    LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT
+    )
+)
 
 status = TextView(this).apply {
     text = "Not connected"
     textSize = 14f
     typeface = Typeface.DEFAULT_BOLD
     setTextColor(if (dark) cyan else Color.rgb(0, 120, 135))
-    includeFontPadding = true
-    maxLines = 2
-    setPadding(0, dp(6), 0, dp(4))
+    setPadding(0, dp(6), 0, 0)
+    visibility = View.VISIBLE
 }
 
 statusPanel.addView(
     status,
     LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT
+    )
+)
+
+accountCard.addView(statusPanel, matchParams(12))
+
+root.addView(
+    accountCard,
+    LinearLayout.LayoutParams(
+        -1,
         LinearLayout.LayoutParams.WRAP_CONTENT
     )
 )
