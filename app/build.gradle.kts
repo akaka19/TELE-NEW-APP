@@ -9,8 +9,8 @@ android {
         applicationId = "com.company.phonedirectory"
         minSdk = 24
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.0.6"
+        versionCode = 11
+        versionName = "1.0.11"
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
