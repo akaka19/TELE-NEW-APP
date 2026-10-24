@@ -174,7 +174,7 @@ class SIPActivity : Activity() {
         }
 
         val scroll = ScrollView(this).apply {
-            isfillViewport = true
+            isFillViewport = true
             isVerticalScrollBarEnabled = false
             addView(root)
         }
