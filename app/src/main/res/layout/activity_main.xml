@@ -4,69 +4,81 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="18dp"
+    android:padding="16dp"
     android:background="#0B1020">
 
-    <!-- Header -->
+    <!-- Modern header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:layout_height="58dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/menuButton"
-            android:layout_width="46dp"
+            android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="☰"
             android:textSize="22sp"
             android:textAllCaps="false"
-            android:backgroundTint="#202A42"
+            android:backgroundTint="#19263B"
             android:textColor="#35D7F2" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="13dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="HIPATH / SYSTEMS"
-                android:textColor="#35D7F2"
-                android:textStyle="bold"
-                android:textSize="11sp" />
+                android:text="HiPath"
+                android:textColor="#F4F7FF"
+                android:textSize="23sp"
+                android:textStyle="bold" />
 
-            <!-- Directory title hidden -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TELEPHONE DIRECTORY"
+                android:textColor="#35D7F2"
+                android:textSize="10sp"
+                android:letterSpacing="0.12"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/directoryTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
                 android:visibility="gone" />
-
         </LinearLayout>
 
         <Button
             android:id="@+id/themeButton"
-            android:layout_width="46dp"
+            android:layout_width="48dp"
             android:layout_height="48dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
             android:text="☼"
+            android:textSize="21sp"
             android:textAllCaps="false"
-            android:backgroundTint="#202A42"
+            android:backgroundTint="#19263B"
             android:textColor="#35D7F2" />
-
     </LinearLayout>
 
-    <!-- Contact count summary -->
+    <!-- Summary card -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="16dp"
-        android:layout_marginTop="18dp"
+        android:padding="20dp"
         android:background="@drawable/bg_summary">
 
         <LinearLayout
@@ -78,98 +90,134 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TELEPHONE EXTENSIONS"
+                android:text="YOUR DIRECTORY"
                 android:textColor="#C3F8FF"
                 android:textSize="11sp"
+                android:letterSpacing="0.10"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/contactCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:text="0"
                 android:textColor="#FFFFFF"
-                android:textSize="30sp"
+                android:textSize="38sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Saved extensions"
+                android:textColor="#C3F8FF"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="66dp"
+            android:layout_height="66dp"
             android:gravity="center"
-            android:text="▦"
+            android:text="☎"
             android:textColor="#35D7F2"
-            android:textSize="30sp" />
-
+            android:textSize="37sp"
+            android:background="#193D50" />
     </LinearLayout>
 
-    <!-- Search -->
+    <!-- Search field -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:text="Find an extension"
+        android:textColor="#F4F7FF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
     <EditText
         android:id="@+id/searchInput"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/bg_input"
-        android:hint="Search any contact field..."
+        android:hint="⌕   Search number, name, service..."
         android:singleLine="true"
         android:textColor="#F4F7FF"
         android:textColorHint="#8290AA"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:inputType="text" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:inputType="text"
+        android:imeOptions="actionSearch" />
 
-    <!-- Contacts heading -->
-    <TextView
-        android:id="@+id/contactsTitle"
+    <!-- List heading -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Contacts"
-        android:textColor="#F4F7FF"
-        android:textSize="19sp"
-        android:textStyle="bold"
-        android:paddingTop="18dp"
-        android:paddingBottom="10dp" />
+        android:layout_marginTop="23dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <!-- Contacts list and empty state -->
+        <TextView
+            android:id="@+id/contactsTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="All Contacts"
+            android:textColor="#F4F7FF"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PHONEBOOK"
+            android:textColor="#35D7F2"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Scrollable contact grid -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_marginTop="10dp">
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:clipToPadding="false">
 
             <LinearLayout
                 android:id="@+id/contactList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
-
+                android:orientation="vertical"
+                android:paddingBottom="10dp" />
         </ScrollView>
 
         <TextView
             android:id="@+id/emptyText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:gravity="center"
             android:padding="28dp"
-            android:text="No contacts yet&#10;Tap Add Contact to create your first entry."
+            android:text="No contacts found\nAdd a new extension to get started."
             android:textColor="#8290AA"
+            android:textSize="14sp"
             android:visibility="gone" />
-
     </FrameLayout>
 
-    <!-- Add contact -->
+    <!-- Primary action -->
     <Button
         android:id="@+id/addButton"
         android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
         android:backgroundTint="#35D7F2"
-        android:text="+  Add Contact"
+        android:text="+   Add Contact"
         android:textAllCaps="false"
         android:textColor="#0B1020"
         android:textSize="16sp"
