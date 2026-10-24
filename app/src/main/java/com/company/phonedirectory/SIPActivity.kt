@@ -298,44 +298,55 @@ class SIPActivity : Activity() {
             Color.rgb(7, 25, 38)
         )
 
-        accountCard.addView(connectButton, matchParams(4))
+accountCard.addView(connectButton, matchParams(4))
 
-        val statusPanel = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(12), dp(12), dp(12), dp(12))
-            background = rounded(
-                if (dark) Color.rgb(13, 43, 48)
-                else Color.rgb(232, 249, 247),
-                12
-            )
-        }
+val statusPanel = LinearLayout(this).apply {
+    orientation = LinearLayout.VERTICAL
+    setPadding(dp(12), dp(12), dp(12), dp(12))
+    minimumHeight = dp(76)
+    background = rounded(
+        if (dark) Color.rgb(13, 43, 48)
+        else Color.rgb(232, 249, 247),
+        12
+    )
+}
 
-        statusPanel.addView(TextView(this).apply {
-            text = "CONNECTION STATUS"
-            textSize = 10f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(mutedColor)
-        })
+statusPanel.addView(TextView(this).apply {
+    text = "CONNECTION STATUS"
+    textSize = 10f
+    typeface = Typeface.DEFAULT_BOLD
+    setTextColor(mutedColor)
+    includeFontPadding = true
+    maxLines = 1
+})
 
-        status = TextView(this).apply {
-            text = "Not connected"
-            textSize = 14f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(if (dark) cyan else Color.rgb(0, 120, 135))
-            setPadding(0, dp(6), 0, 0)
-        }
+status = TextView(this).apply {
+    text = "Not connected"
+    textSize = 14f
+    typeface = Typeface.DEFAULT_BOLD
+    setTextColor(if (dark) cyan else Color.rgb(0, 120, 135))
+    includeFontPadding = true
+    maxLines = 2
+    setPadding(0, dp(6), 0, dp(4))
+}
 
-        statusPanel.addView(status)
+statusPanel.addView(
+    status,
+    LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT
+    )
+)
 
-        accountCard.addView(statusPanel, matchParams(12))
+accountCard.addView(statusPanel, matchParams(12))
 
-        root.addView(
-            accountCard,
-            LinearLayout.LayoutParams(
-                -1,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        )
+root.addView(
+    accountCard,
+    LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT
+    )
+)
 
         // Dialer card
         val dialCard = cardContainer(cardColor)
