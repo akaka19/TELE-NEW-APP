@@ -115,7 +115,6 @@ class MainActivity : Activity() {
             setBackgroundColor(panelColor)
         }
 
-        // Header without the "Directory" title.
         panel.addView(TextView(this).apply {
             text = "HIPATH"
             textSize = 12f
@@ -123,8 +122,6 @@ class MainActivity : Activity() {
             setTextColor(accent)
             setPadding(0, 0, 0, dp(24))
         })
-
-        // Directory heading and menu item removed.
 
         addMenuItem(panel, "☎", "SIP Calling", textColor) {
             menuPopup?.dismiss()
@@ -155,6 +152,12 @@ class MainActivity : Activity() {
         addMenuItem(panel, "⚙", "Settings", textColor) {
             menuPopup?.dismiss()
             startActivity(Intent(this, SecurityActivity::class.java))
+        }
+
+        // About page
+        addMenuItem(panel, "ⓘ", "About", textColor) {
+            menuPopup?.dismiss()
+            startActivity(Intent(this, AboutActivity::class.java))
         }
 
         panel.addView(
