@@ -1,17 +1,13 @@
 
 package com.company.phonedirectory
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import org.linphone.core.Account
 import org.linphone.core.AudioDevice
 import org.linphone.core.Call
@@ -55,6 +51,7 @@ class SIPActivity : Activity() {
     }
 
     private val profiles = mutableListOf<SipProfile>()
+
     private var selectedProfileIndex = -1
 
     private val transportOptions = listOf("UDP", "TCP", "TLS")
@@ -108,6 +105,7 @@ class SIPActivity : Activity() {
 
         settingsButton.setOnClickListener {
             settingsVisible = !settingsVisible
+
             settingsPanel.visibility =
                 if (settingsVisible) View.VISIBLE else View.GONE
 
@@ -157,9 +155,6 @@ class SIPActivity : Activity() {
                 if (speakerEnabled) "Speaker: ON"
                 else "Speaker: OFF"
         }
-
-        findViewById<Button>(R.id_dummy_placeholder_safe)?.visibility =
-            View.GONE
     }
 
     private fun buildUi() {
@@ -203,10 +198,12 @@ class SIPActivity : Activity() {
             newAccountButton,
             LinearLayout.LayoutParams(0, -2, 1f)
         )
+
         accountActions.addView(
             deleteAccountButton,
             LinearLayout.LayoutParams(0, -2, 1f)
         )
+
         root.addView(accountActions)
 
         settingsButton = makeButton("SIP Settings")
@@ -234,6 +231,7 @@ class SIPActivity : Activity() {
             "SIP password",
             ""
         )
+
         passwordField.inputType =
             android.text.InputType.TYPE_CLASS_TEXT or
                 android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
@@ -243,16 +241,20 @@ class SIPActivity : Activity() {
             "SIP port",
             "5060"
         )
-        portField.inputType = android.text.InputType.TYPE_CLASS_NUMBER
+
+        portField.inputType =
+            android.text.InputType.TYPE_CLASS_NUMBER
 
         addLabel(settingsPanel, "Transport")
 
         transportSpinner = Spinner(this)
+
         transportSpinner.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
             transportOptions
         )
+
         settingsPanel.addView(transportSpinner)
 
         connectButton = makeButton("Save and connect")
@@ -266,6 +268,7 @@ class SIPActivity : Activity() {
             setTextColor(0xFFFFFFFF.toInt())
             setPadding(0, 20, 0, 12)
         }
+
         root.addView(callStateText)
 
         numberField = addEditField(
@@ -299,8 +302,8 @@ class SIPActivity : Activity() {
 
         newAccountButton.setOnClickListener {
             selectedProfileIndex = -1
-            accountSpinner.setSelection(0)
             clearAccountFields()
+
             settingsVisible = true
             settingsPanel.visibility = View.VISIBLE
             settingsButton.text = "Hide SIP Settings"
@@ -312,6 +315,7 @@ class SIPActivity : Activity() {
 
         accountSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
+
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
                     view: View?,
@@ -332,13 +336,17 @@ class SIPActivity : Activity() {
             }
     }
 
-    private fun addLabel(parent: LinearLayout, text: String) {
+    private fun addLabel(
+        parent: LinearLayout,
+        text: String
+    ) {
         val label = TextView(this).apply {
             this.text = text
             textSize = 14f
             setTextColor(0xFFB8C7D9.toInt())
             setPadding(0, 12, 0, 4)
         }
+
         parent.addView(label)
     }
 
@@ -408,7 +416,10 @@ class SIPActivity : Activity() {
                             domain = item.optString("domain"),
                             password = item.optString("password"),
                             port = item.optInt("port", 5060),
-                            transport = item.optString("transport", "UDP")
+                            transport = item.optString(
+                                "transport",
+                                "UDP"
+                            )
                         )
                     )
                 }
@@ -417,23 +428,34 @@ class SIPActivity : Activity() {
             }
         }
 
-        // Migrate a previously saved single SIP account if necessary.
         if (profiles.isEmpty()) {
-            val oldUsername = preferences.getString("username", "").orEmpty()
-            val oldDomain = preferences.getString("domain", "").orEmpty()
+            val oldUsername =
+                preferences.getString("username", "").orEmpty()
 
-            if (oldUsername.isNotBlank() && oldDomain.isNotBlank()) {
+            val oldDomain =
+                preferences.getString("domain", "").orEmpty()
+
+            if (
+                oldUsername.isNotBlank() &&
+                oldDomain.isNotBlank()
+            ) {
                 profiles.add(
                     SipProfile(
                         name = "$oldUsername@$oldDomain",
                         username = oldUsername,
                         domain = oldDomain,
-                        password = preferences.getString("password", "").orEmpty(),
+                        password = preferences.getString(
+                            "password",
+                            ""
+                        ).orEmpty(),
                         port = preferences.getInt("port", 5060),
-                        transport = preferences.getString("transport", "UDP")
-                            .orEmpty()
+                        transport = preferences.getString(
+                            "transport",
+                            "UDP"
+                        ).orEmpty()
                     )
                 )
+
                 saveProfiles()
             }
         }
@@ -444,12 +466,14 @@ class SIPActivity : Activity() {
 
         profiles.forEach { profile ->
             val item = JSONObject()
+
             item.put("name", profile.name)
             item.put("username", profile.username)
             item.put("domain", profile.domain)
             item.put("password", profile.password)
             item.put("port", profile.port)
             item.put("transport", profile.transport)
+
             array.put(item)
         }
 
@@ -459,7 +483,9 @@ class SIPActivity : Activity() {
     }
 
     private fun refreshAccountSpinner() {
-        val names = profiles.map { it.name }.toMutableList()
+        val names = profiles.map {
+            it.name
+        }.toMutableList()
 
         if (names.isEmpty()) {
             names.add("No saved accounts")
@@ -472,7 +498,11 @@ class SIPActivity : Activity() {
         )
 
         if (profiles.isNotEmpty()) {
-            val index = selectedProfileIndex.coerceIn(0, profiles.lastIndex)
+            val index = selectedProfileIndex.coerceIn(
+                0,
+                profiles.lastIndex
+            )
+
             accountSpinner.setSelection(index)
             showProfile(profiles[index])
         }
@@ -504,9 +534,11 @@ class SIPActivity : Activity() {
             .setPositiveButton("Delete") { _, _ ->
                 profiles.removeAt(selectedProfileIndex)
                 selectedProfileIndex = -1
+
                 saveProfiles()
                 refreshAccountSpinner()
                 clearAccountFields()
+
                 showMessage("Account deleted")
             }
             .show()
@@ -517,10 +549,15 @@ class SIPActivity : Activity() {
         val domain = domainField.text.toString().trim()
         val password = passwordField.text.toString()
         val port = portField.text.toString().toIntOrNull() ?: 5060
+
         val transport =
             transportSpinner.selectedItem?.toString() ?: "UDP"
 
-        if (username.isBlank() || domain.isBlank() || password.isBlank()) {
+        if (
+            username.isBlank() ||
+            domain.isBlank() ||
+            password.isBlank()
+        ) {
             showMessage("Enter username, domain and password")
             return
         }
@@ -533,7 +570,8 @@ class SIPActivity : Activity() {
         val profileName = "$username@$domain"
 
         val existingIndex = profiles.indexOfFirst {
-            it.username == username && it.domain == domain
+            it.username == username &&
+                it.domain == domain
         }
 
         val profile = SipProfile(
@@ -604,11 +642,16 @@ class SIPActivity : Activity() {
     }
 
     private fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            this,
+            message,
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+
         SIPEngine.listener = null
         SIPEngine.statusListener = null
     }
@@ -644,6 +687,7 @@ class SIPActivity : Activity() {
             activeCall = null
 
             val factory = Factory.instance()
+
             val newCore = factory.createCore(
                 null,
                 null,
@@ -695,21 +739,41 @@ class SIPActivity : Activity() {
                         else -> call
                     }
 
-                    val incoming = state == Call.State.IncomingReceived
+                    val incoming =
+                        state == Call.State.IncomingReceived
 
                     val label = when (state) {
                         Call.State.IncomingReceived ->
                             "Incoming call from " +
-                                (call.remoteAddress?.username ?: "unknown")
+                                (
+                                    call.remoteAddress?.username
+                                        ?: "unknown"
+                                )
 
-                        Call.State.OutgoingInit -> "Starting call…"
-                        Call.State.OutgoingProgress -> "Calling…"
-                        Call.State.OutgoingRinging -> "Ringing…"
-                        Call.State.Connected -> "Connected"
-                        Call.State.StreamsRunning -> "Call in progress"
-                        Call.State.End -> "Call ended"
-                        Call.State.Error -> "Call error: $message"
-                        Call.State.Released -> "Call finished"
+                        Call.State.OutgoingInit ->
+                            "Starting call…"
+
+                        Call.State.OutgoingProgress ->
+                            "Calling…"
+
+                        Call.State.OutgoingRinging ->
+                            "Ringing…"
+
+                        Call.State.Connected ->
+                            "Connected"
+
+                        Call.State.StreamsRunning ->
+                            "Call in progress"
+
+                        Call.State.End ->
+                            "Call ended"
+
+                        Call.State.Error ->
+                            "Call error: $message"
+
+                        Call.State.Released ->
+                            "Call finished"
+
                         else -> "Call: $state"
                     }
 
@@ -718,12 +782,17 @@ class SIPActivity : Activity() {
                 }
             })
 
-            val identity = factory.createAddress("sip:$username@$domain")
-                ?: throw IllegalArgumentException("Invalid SIP identity or domain")
+            val identity = factory.createAddress(
+                "sip:$username@$domain"
+            ) ?: throw IllegalArgumentException(
+                "Invalid SIP identity or domain"
+            )
 
             val server = factory.createAddress(
                 "sip:$domain:$port;transport=${transport.lowercase()}"
-            ) ?: throw IllegalArgumentException("Invalid SIP server address")
+            ) ?: throw IllegalArgumentException(
+                "Invalid SIP server address"
+            )
 
             val auth = factory.createAuthInfo(
                 username,
@@ -741,7 +810,8 @@ class SIPActivity : Activity() {
             params.serverAddress = server
             params.isRegisterEnabled = true
 
-            val account: Account = newCore.createAccount(params)
+            val account: Account =
+                newCore.createAccount(params)
 
             newCore.addAccount(account)
             newCore.defaultAccount = account
@@ -750,6 +820,7 @@ class SIPActivity : Activity() {
             newCore.start()
 
             currentStatus = "SIP engine started — registering…"
+
             statusListener?.invoke(currentStatus)
             listener?.invoke(currentStatus, false)
         }
@@ -765,11 +836,15 @@ class SIPActivity : Activity() {
 
         fun call(target: String) {
             val currentCore = core
-                ?: throw IllegalStateException("SIP account is not connected")
+                ?: throw IllegalStateException(
+                    "SIP account is not connected"
+                )
 
             val clean = target.trim()
 
-            val uri = if (clean.startsWith("sip:", ignoreCase = true)) {
+            val uri = if (
+                clean.startsWith("sip:", ignoreCase = true)
+            ) {
                 clean
             } else {
                 val sipDomain = currentCore.defaultAccount
@@ -779,7 +854,9 @@ class SIPActivity : Activity() {
                     .orEmpty()
 
                 if (sipDomain.isBlank()) {
-                    throw IllegalStateException("SIP domain is missing")
+                    throw IllegalStateException(
+                        "SIP domain is missing"
+                    )
                 }
 
                 "sip:$clean@$sipDomain"
@@ -802,12 +879,11 @@ class SIPActivity : Activity() {
 
         fun endCall() {
             val call = activeCall
+                ?: throw IllegalStateException(
+                    "There is no active call"
+                )
 
-            if (call != null) {
-                call.terminate()
-            } else {
-                throw IllegalStateException("There is no active call")
-            }
+            call.terminate()
         }
 
         fun setMicrophoneMuted(muted: Boolean) {
